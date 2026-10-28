@@ -8,6 +8,7 @@ import { CommunityTab } from './components/CommunityTab';
 import { VerificationModal } from './components/VerificationModal';
 import { INITIAL_BILLS, INITIAL_NEWS, INITIAL_COMMUNITY_POLLS } from './data/mockData';
 import type { LawBill, NewsArticle, CommunityPoll, UserVerificationState } from './types';
+import { networkService } from './services/networkService';
 import { Download } from 'lucide-react';
 
 export function App() {
@@ -73,6 +74,51 @@ export function App() {
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstall);
     return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
+  }, []);
+
+  // Sync with Decentralized Network (Nostr Relays)
+  useEffect(() => {
+    // 1. Fetch existing public polls from the network
+    networkService.fetchNetworkPolls().then((networkPolls) => {
+      if (networkPolls.length > 0) {
+        setCommunityPolls((prev) => {
+          const map = new Map<string, CommunityPoll>();
+          // Remote network polls first
+          networkPolls.forEach((p) => map.set(p.id, p));
+          // Prepend local polls if they don't exist remotely yet
+          prev.forEach((p) => {
+            if (!map.has(p.id)) map.set(p.id, p);
+          });
+          return Array.from(map.values());
+        });
+      }
+    });
+
+    // 2. Real-time subscription to events from any user across the globe
+    const unsubscribe = networkService.subscribeToRealtimeEvents(
+      (newPoll) => {
+        setCommunityPolls((prev) => {
+          if (prev.some((p) => p.id === newPoll.id)) return prev;
+          return [newPoll, ...prev];
+        });
+      },
+      (pollId, choice) => {
+        setCommunityPolls((prev) =>
+          prev.map((poll) => {
+            if (poll.id !== pollId) return poll;
+            return {
+              ...poll,
+              votes: {
+                yes: choice === 'yes' ? poll.votes.yes + 1 : poll.votes.yes,
+                no: choice === 'no' ? poll.votes.no + 1 : poll.votes.no
+              }
+            };
+          })
+        );
+      }
+    );
+
+    return () => unsubscribe();
   }, []);
 
   const handleInstallPWA = async () => {
@@ -144,6 +190,9 @@ export function App() {
   };
 
   const handleVoteCommunityPoll = (pollId: string, choice: 'yes' | 'no') => {
+    // Broadcast vote to decentralized network relays
+    networkService.publishVote(pollId, choice, userState.isCertified);
+
     setCommunityPolls((prev) =>
       prev.map((poll) => {
         if (poll.id !== pollId) return poll;
@@ -169,16 +218,27 @@ export function App() {
   const handleCreateCommunityPoll = (
     newPollData: Omit<CommunityPoll, 'id' | 'votes' | 'userVoted' | 'commentsCount' | 'timeAgo'>
   ) => {
+    const pollId = 'poll-' + Date.now();
     const newPoll: CommunityPoll = {
       ...newPollData,
-      id: 'poll-' + Date.now(),
+      id: pollId,
       votes: { yes: 1, no: 0 },
       userVoted: 'yes',
       commentsCount: 0,
       timeAgo: 'Recién publicado'
     };
 
-    setCommunityPolls([newPoll, ...communityPolls]);
+    // Broadcast poll to decentralized network relays (Nostr)
+    networkService.publishPoll({
+      id: pollId,
+      author: newPoll.author,
+      isAuthorVerified: newPoll.isAuthorVerified,
+      category: newPoll.category,
+      question: newPoll.question,
+      context: newPoll.context
+    });
+
+    setCommunityPolls((prev) => [newPoll, ...prev]);
   };
 
   const handleCompleteVerification = (method: 'World ID' | 'DNI + Selfie' | 'DNI NFC') => {

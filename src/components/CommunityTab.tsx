@@ -10,10 +10,14 @@ import {
   Share2, 
   ShieldCheck, 
   Sparkles, 
-  Send
+  Send,
+  Radio,
+  Globe,
+  Lock
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import type { CommunityPoll, UserVerificationState } from '../types';
+import { networkService } from '../services/networkService';
 
 interface CommunityTabProps {
   polls: CommunityPoll[];
@@ -128,6 +132,35 @@ export const CommunityTab: React.FC<CommunityTabProps> = ({
             <Plus className="w-4 h-4 stroke-[3]" />
             <span>Crear Pregunta</span>
           </button>
+        </div>
+      </div>
+
+      {/* Live Decentralized Network Status Banner */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 px-3.5 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-xs font-mono shadow-sm">
+        <div className="flex items-center gap-2">
+          <span className="relative flex h-2.5 w-2.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+          </span>
+          <div className="flex items-center gap-1.5">
+            <span className="text-white font-semibold flex items-center gap-1">
+              <Globe className="w-3.5 h-3.5 text-sky-400" />
+              Red Descentralizada en Vivo
+            </span>
+            <span className="text-[10px] text-slate-500 hidden sm:inline">(Relays: nos.lol, relay.primal.net)</span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 text-[11px] text-slate-400">
+          <span className="flex items-center gap-1 text-emerald-400">
+            <Radio className="w-3.5 h-3.5 animate-pulse" />
+            <span>Visible para toda la red</span>
+          </span>
+          <span className="text-slate-600 hidden sm:inline">•</span>
+          <span className="hidden sm:flex items-center gap-1 text-slate-400" title="Tu clave pública de firma en la red">
+            <Lock className="w-3 h-3 text-slate-500" />
+            <span>ID: {networkService.getShortKey()}</span>
+          </span>
         </div>
       </div>
 
