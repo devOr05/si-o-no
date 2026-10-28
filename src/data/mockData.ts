@@ -134,7 +134,9 @@ export const INITIAL_NEWS: NewsArticle[] = [
     ],
     readTime: '2 min',
     url: 'https://infobae.com',
-    likes: 421
+    likes: 421,
+    votes: { yes: 840, no: 290 },
+    userVoted: null
   },
   {
     id: 'news-2',
@@ -150,7 +152,9 @@ export const INITIAL_NEWS: NewsArticle[] = [
     ],
     readTime: '3 min',
     url: 'https://lanacion.com.ar',
-    likes: 310
+    likes: 310,
+    votes: { yes: 620, no: 180 },
+    userVoted: null
   },
   {
     id: 'news-3',
@@ -166,7 +170,9 @@ export const INITIAL_NEWS: NewsArticle[] = [
     ],
     readTime: '2 min',
     url: 'https://clarin.com',
-    likes: 852
+    likes: 852,
+    votes: { yes: 1450, no: 95 },
+    userVoted: null
   },
   {
     id: 'news-4',
@@ -182,7 +188,9 @@ export const INITIAL_NEWS: NewsArticle[] = [
     ],
     readTime: '4 min',
     url: 'https://bbc.com/mundo',
-    likes: 645
+    likes: 645,
+    votes: { yes: 980, no: 120 },
+    userVoted: null
   },
   {
     id: 'news-5',
@@ -198,7 +206,9 @@ export const INITIAL_NEWS: NewsArticle[] = [
     ],
     readTime: '2 min',
     url: 'https://ole.com.ar',
-    likes: 1205
+    likes: 1205,
+    votes: { yes: 1820, no: 240 },
+    userVoted: null
   },
   {
     id: 'news-6',
@@ -214,7 +224,9 @@ export const INITIAL_NEWS: NewsArticle[] = [
     ],
     readTime: '3 min',
     url: 'https://rollingstone.com',
-    likes: 490
+    likes: 490,
+    votes: { yes: 510, no: 80 },
+    userVoted: null
   }
 ];
 

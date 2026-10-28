@@ -54,6 +54,11 @@ export interface NewsArticle {
   url: string;
   likes: number;
   userLiked?: boolean;
+  votes?: {
+    yes: number;
+    no: number;
+  };
+  userVoted?: 'yes' | 'no' | null;
 }
 
 export interface CommunityPoll {

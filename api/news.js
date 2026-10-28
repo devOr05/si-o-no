@@ -79,7 +79,12 @@ export default async function handler(req, res) {
             readTime: '2 min',
             url: link,
             likes: Math.floor(150 + Math.random() * 400),
-            userLiked: false
+            userLiked: false,
+            votes: {
+              yes: Math.floor(140 + Math.random() * 320),
+              no: Math.floor(40 + Math.random() * 180)
+            },
+            userVoted: null
           };
         });
       })

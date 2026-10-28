@@ -228,6 +228,30 @@ export function App() {
     );
   };
 
+  const handleVoteNews = (articleId: string, choice: 'yes' | 'no') => {
+    setNews((prevNews) =>
+      prevNews.map((article) => {
+        if (article.id !== articleId) return article;
+
+        const previousVote = article.userVoted;
+        let newYes = article.votes?.yes ?? 0;
+        let newNo = article.votes?.no ?? 0;
+
+        if (previousVote === 'yes') newYes = Math.max(0, newYes - 1);
+        if (previousVote === 'no') newNo = Math.max(0, newNo - 1);
+
+        if (choice === 'yes') newYes++;
+        else newNo++;
+
+        return {
+          ...article,
+          userVoted: choice,
+          votes: { yes: newYes, no: newNo }
+        };
+      })
+    );
+  };
+
   const handleVoteCommunityPoll = (pollId: string, choice: 'yes' | 'no') => {
     // Broadcast vote to decentralized network relays
     networkService.publishVote(pollId, choice, userState.isCertified);
@@ -333,6 +357,7 @@ export function App() {
           <NewsTab
             news={news}
             onToggleLike={handleToggleLikeNews}
+            onVoteNews={handleVoteNews}
             onRefreshNews={handleRefreshNews}
             isRefreshing={isRefreshingNews}
           />

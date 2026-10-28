@@ -8,13 +8,17 @@ import {
   Share2, 
   Clock, 
   TrendingUp,
-  RefreshCw
+  RefreshCw,
+  Check,
+  X
 } from 'lucide-react';
+import confetti from 'canvas-confetti';
 import type { NewsArticle, NewsCategory } from '../types';
 
 interface NewsTabProps {
   news: NewsArticle[];
   onToggleLike: (articleId: string) => void;
+  onVoteNews: (articleId: string, choice: 'yes' | 'no') => void;
   onRefreshNews?: () => void;
   isRefreshing?: boolean;
 }
@@ -32,12 +36,25 @@ const CATEGORIES: NewsCategory[] = [
 export const NewsTab: React.FC<NewsTabProps> = ({ 
   news, 
   onToggleLike, 
+  onVoteNews,
   onRefreshNews, 
   isRefreshing 
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<NewsCategory>('Todos');
   const [searchQuery, setSearchQuery] = useState('');
   const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const handleVote = (article: NewsArticle, choice: 'yes' | 'no') => {
+    onVoteNews(article.id, choice);
+    if (choice === 'yes') {
+      confetti({
+        particleCount: 35,
+        spread: 55,
+        origin: { y: 0.8 },
+        colors: ['#10b981', '#34d399', '#6ee7b7']
+      });
+    }
+  };
 
   const filteredNews = news.filter((item) => {
     const matchCategory = selectedCategory === 'Todos' || item.category === selectedCategory;
@@ -185,6 +202,68 @@ export const NewsTab: React.FC<NewsTabProps> = ({
                   ))}
                 </ul>
               </div>
+
+              {/* News Voting Buttons [ SÍ ] / [ NO ] */}
+              {(() => {
+                const votesYes = item.votes?.yes ?? 0;
+                const votesNo = item.votes?.no ?? 0;
+                const totalVotes = votesYes + votesNo;
+                const yesPct = totalVotes > 0 ? Math.round((votesYes / totalVotes) * 100) : 50;
+                const noPct = 100 - yesPct;
+
+                return (
+                  <div className="pt-2 pb-1 space-y-2 border-t border-slate-800/60">
+                    <div className="flex items-center justify-between text-[11px] font-mono text-slate-400">
+                      <span className="uppercase tracking-wider font-semibold text-slate-300">
+                        {item.userVoted ? 'Tu Voto Registrado:' : '¿Qué opinas sobre este hecho?'}
+                      </span>
+                      <span className="text-slate-500 text-[10px]">
+                        {totalVotes.toLocaleString()} votos de la comunidad
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2.5">
+                      {/* BOTÓN SÍ */}
+                      <button
+                        onClick={() => handleVote(item, 'yes')}
+                        className={`py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-sm ${
+                          item.userVoted === 'yes'
+                            ? 'bg-emerald-500 text-slate-950 font-black ring-2 ring-emerald-400/40 shadow-emerald-500/20'
+                            : 'bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 hover:border-emerald-400/50'
+                        }`}
+                      >
+                        <Check className={`w-4 h-4 ${item.userVoted === 'yes' ? 'stroke-[3]' : ''}`} />
+                        <span>SÍ ({yesPct}%)</span>
+                      </button>
+
+                      {/* BOTÓN NO */}
+                      <button
+                        onClick={() => handleVote(item, 'no')}
+                        className={`py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-sm ${
+                          item.userVoted === 'no'
+                            ? 'bg-rose-600 text-white font-black ring-2 ring-rose-500/40 shadow-rose-600/20'
+                            : 'bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 hover:border-rose-400/50'
+                        }`}
+                      >
+                        <X className={`w-4 h-4 ${item.userVoted === 'no' ? 'stroke-[3]' : ''}`} />
+                        <span>NO ({noPct}%)</span>
+                      </button>
+                    </div>
+
+                    {/* Percentage Progress Bar */}
+                    <div className="space-y-1">
+                      <div className="w-full h-2 bg-slate-900 rounded-full overflow-hidden flex border border-slate-800">
+                        <div style={{ width: `${yesPct}%` }} className="h-full bg-emerald-500 transition-all duration-300" />
+                        <div style={{ width: `${noPct}%` }} className="h-full bg-rose-600 transition-all duration-300" />
+                      </div>
+                      <div className="flex items-center justify-between text-[10px] font-mono text-slate-500">
+                        <span className="text-emerald-400 font-semibold">{yesPct}% SÍ</span>
+                        <span className="text-rose-400 font-semibold">{noPct}% NO</span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
 
               {/* Card Footer Actions */}
               <div className="flex items-center justify-between pt-1 border-t border-slate-800/60 text-xs">
