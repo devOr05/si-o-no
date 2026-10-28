@@ -1,6 +1,7 @@
 # ¿SÍ O NO? — Plataforma Cívica de Votación Ciudadana & Noticias Curadas
 
-[![PWA Ready](https://img.shields.io/badge/PWA-Ready-emerald.svg)](https://si-o-no.vercel.app)
+[![Demo en Vivo](https://img.shields.io/badge/Vercel-En%20Vivo-emerald.svg)](https://si-o-no-phi.vercel.app/)
+[![PWA Ready](https://img.shields.io/badge/PWA-Ready-sky.svg)](https://si-o-no-phi.vercel.app/)
 [![React](https://img.shields.io/badge/React-19-blue.svg)](https://react.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-7.0-blue.svg)](https://typescriptlang.org)
 [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4-38bdf8.svg)](https://tailwindcss.com)
