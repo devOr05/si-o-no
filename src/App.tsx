@@ -9,6 +9,7 @@ import { VerificationModal } from './components/VerificationModal';
 import { INITIAL_BILLS, INITIAL_NEWS, INITIAL_COMMUNITY_POLLS } from './data/mockData';
 import type { LawBill, NewsArticle, CommunityPoll, UserVerificationState } from './types';
 import { networkService } from './services/networkService';
+import { scraperService } from './services/scraperService';
 import { Download } from 'lucide-react';
 
 export function App() {
@@ -46,6 +47,7 @@ export function App() {
   const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [canInstallPWA, setCanInstallPWA] = useState(false);
+  const [isRefreshingNews, setIsRefreshingNews] = useState(false);
 
   // Save changes to LocalStorage
   useEffect(() => {
@@ -120,6 +122,43 @@ export function App() {
 
     return () => unsubscribe();
   }, []);
+
+  // Live News Scraping Effect
+  useEffect(() => {
+    scraperService.fetchLiveNews().then((liveNews) => {
+      if (liveNews.length > 0) {
+        setNews((prev) => {
+          const map = new Map<string, NewsArticle>();
+          // Live scraped news first
+          liveNews.forEach((n) => map.set(n.title, n));
+          // Prepend existing local news
+          prev.forEach((n) => {
+            if (!map.has(n.title)) map.set(n.title, n);
+          });
+          return Array.from(map.values());
+        });
+      }
+    });
+  }, []);
+
+  const handleRefreshNews = async () => {
+    setIsRefreshingNews(true);
+    try {
+      const liveNews = await scraperService.fetchLiveNews();
+      if (liveNews.length > 0) {
+        setNews((prev) => {
+          const map = new Map<string, NewsArticle>();
+          liveNews.forEach((n) => map.set(n.title, n));
+          prev.forEach((n) => {
+            if (!map.has(n.title)) map.set(n.title, n);
+          });
+          return Array.from(map.values());
+        });
+      }
+    } finally {
+      setIsRefreshingNews(false);
+    }
+  };
 
   const handleInstallPWA = async () => {
     if (deferredPrompt) {
@@ -294,6 +333,8 @@ export function App() {
           <NewsTab
             news={news}
             onToggleLike={handleToggleLikeNews}
+            onRefreshNews={handleRefreshNews}
+            isRefreshing={isRefreshingNews}
           />
         )}
 

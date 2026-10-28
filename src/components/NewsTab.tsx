@@ -7,13 +7,16 @@ import {
   Heart, 
   Share2, 
   Clock, 
-  TrendingUp
+  TrendingUp,
+  RefreshCw
 } from 'lucide-react';
 import type { NewsArticle, NewsCategory } from '../types';
 
 interface NewsTabProps {
   news: NewsArticle[];
   onToggleLike: (articleId: string) => void;
+  onRefreshNews?: () => void;
+  isRefreshing?: boolean;
 }
 
 const CATEGORIES: NewsCategory[] = [
@@ -26,7 +29,12 @@ const CATEGORIES: NewsCategory[] = [
   'Deportes'
 ];
 
-export const NewsTab: React.FC<NewsTabProps> = ({ news, onToggleLike }) => {
+export const NewsTab: React.FC<NewsTabProps> = ({ 
+  news, 
+  onToggleLike, 
+  onRefreshNews, 
+  isRefreshing 
+}) => {
   const [selectedCategory, setSelectedCategory] = useState<NewsCategory>('Todos');
   const [searchQuery, setSearchQuery] = useState('');
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -71,9 +79,22 @@ export const NewsTab: React.FC<NewsTabProps> = ({ news, onToggleLike }) => {
             </p>
           </div>
 
-          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs font-mono shrink-0">
-            <TrendingUp className="w-3.5 h-3.5" />
-            <span>Monitoreo 24/7</span>
+          <div className="flex items-center gap-2 shrink-0">
+            {onRefreshNews && (
+              <button
+                onClick={onRefreshNews}
+                disabled={isRefreshing}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-mono font-semibold transition-all active:scale-95 disabled:opacity-50"
+                title="Actualizar noticias en vivo scrapeando Clarín, La Nación y BBC Mundo"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-amber-400' : ''}`} />
+                <span>{isRefreshing ? 'Scrapeando...' : 'Scrapear en Vivo'}</span>
+              </button>
+            )}
+            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs font-mono">
+              <TrendingUp className="w-3.5 h-3.5" />
+              <span>Monitoreo 24/7</span>
+            </div>
           </div>
         </div>
       </div>
