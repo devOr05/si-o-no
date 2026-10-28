@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a101f"/>
+      <stop offset="100%" stop-color="#050811"/>
+    </linearGradient>
+    <linearGradient id="yesGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+    <linearGradient id="noGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ef4444"/>
+      <stop offset="100%" stop-color="#dc2626"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="15" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Background rounded squircle -->
+  <rect width="512" height="512" rx="128" fill="url(#bgGrad)"/>
+  <rect x="8" y="8" width="496" height="496" rx="120" fill="none" stroke="#38bdf8" stroke-width="4" stroke-opacity="0.3"/>
+
+  <!-- Left: Green Checkmark / SÍ side -->
+  <g filter="url(#glow)">
+    <path d="M 120 256 L 190 326 L 240 180" fill="none" stroke="url(#yesGrad)" stroke-width="42" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- Divider Line -->
+  <line x1="256" y1="120" x2="256" y2="392" stroke="#334155" stroke-width="8" stroke-linecap="round" stroke-dasharray="16 16"/>
+
+  <!-- Right: Red X / NO side -->
+  <g filter="url(#glow)">
+    <path d="M 310 190 L 410 320" fill="none" stroke="url(#noGrad)" stroke-width="42" stroke-linecap="round"/>
+    <path d="M 410 190 L 310 320" fill="none" stroke="url(#noGrad)" stroke-width="42" stroke-linecap="round"/>
+  </g>
+
+  <!-- Bottom Brand Text -->
+  <text x="256" y="440" font-family="'Inter', system-ui, sans-serif" font-size="34" font-weight="900" fill="#f8fafc" text-anchor="middle" letter-spacing="4">¿SÍ O NO?</text>
+</svg>
